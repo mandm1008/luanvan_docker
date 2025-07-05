@@ -1,0 +1,52 @@
+FROM php:8.3-fpm
+
+# Cài gói hệ thống và các thư viện PHP cần thiết
+RUN apt-get update && apt-get install -y \
+    nginx supervisor git unzip wget curl gnupg2 \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    libzip-dev libxml2-dev libonig-dev libcurl4-openssl-dev \
+    libicu-dev libssl-dev libxslt1-dev zlib1g-dev \
+    libpq-dev libsodium-dev \
+ && docker-php-ext-install \
+    pdo pdo_mysql mysqli zip gd xml mbstring opcache intl soap \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy config PHP riêng
+COPY moodle.ini /usr/local/etc/php/conf.d/moodle.ini
+
+# Copy source code Moodle và config
+COPY moodle/ /var/www/html/
+COPY config.php /var/www/html/config.php
+
+# Phân quyền cho www-data
+RUN chown -R www-data:www-data /var/www/html
+
+# Tạo thư mục moodledata và phân quyền
+RUN mkdir -p /moodledata && chown -R www-data:www-data /moodledata
+
+# Copy nginx config
+COPY nginx/default.conf /etc/nginx/sites-available/default
+
+# Copy entrypoint và script tạo env
+COPY entrypoint.sh /entrypoint.sh
+COPY init-env.sh /init-env.sh
+COPY start.sh /start.sh
+RUN chmod +x /entrypoint.sh /init-env.sh /start.sh
+
+# Copy cấu hình supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Mở cổng 8080
+EXPOSE 8080
+
+# ENTRYPOINT
+# ENTRYPOINT ["/start.sh"]
+
+# Dùng supervisor để quản lý nginx + php-fpm
+# CMD exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
+# Khởi động Nginx, PHP-FPM và Node.js khi container chạy
+CMD service php-fpm start && \
+    service nginx start && \
+    /entrypoint.sh && \
+    tail -f /dev/null
