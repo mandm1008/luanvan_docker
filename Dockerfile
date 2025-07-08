@@ -38,14 +38,20 @@ COPY moodle.ini /etc/php/8.3/fpm/conf.d/moodle.ini
 COPY moodle.ini /etc/php/8.3/cli/conf.d/moodle.ini
 
 # Copy source code Moodle và config
-COPY moodle/ /var/www/html/
-COPY config.php /var/www/html/config.php
+# COPY moodle/ /var/www/html/
+# COPY --chown=www-data:www-data moodle/ /var/www/html
+# COPY config.php /var/www/html/config.php
+COPY --chown=www-data:www-data moodle/ /var/www/html/
+COPY --chown=www-data:www-data config.php /var/www/html/config.php
 
-# Phân quyền cho www-data
-RUN chown -R www-data:www-data /var/www/html
 
-# Tạo thư mục moodledata và phân quyền
-RUN mkdir -p /moodledata && chown -R www-data:www-data /moodledata
+# Tạo thư mục moodledata và các thư mục tạm
+RUN mkdir -p /moodledata \
+    /tmp/moodle-cache \
+    /tmp/moodle-temp \
+    /tmp/moodle-localcache && \
+    chown -R www-data:www-data /moodledata /tmp/moodle-* && \
+    chmod -R 777 /moodledata /tmp/moodle-*
 
 # Copy nginx config
 COPY nginx/default.conf /etc/nginx/sites-available/default

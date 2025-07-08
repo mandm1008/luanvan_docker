@@ -31,32 +31,36 @@ $CFG->dboptions = array(
 );
 
 // === Webroot (auto detect) ===
-$CFG->wwwroot = getenv('BASE_URL');
-// $host = $_SERVER['HTTP_HOST'];
-// $CFG->wwwroot = "https://" . $host;
+$_SERVER['HTTPS'] = 'on';
+$CFG->wwwroot = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
 // === Moodle data directory ===
 $CFG->dataroot  = '/moodledata';
 $CFG->admin     = 'admin';
 $CFG->directorypermissions = 0777;
 
+$CFG->tempdir = '/tmp/moodle-temp';
+$CFG->cachedir = '/tmp/moodle-cache';
+$CFG->localcachedir = '/tmp/moodle-localcache';
+
 // === Enable Webservice ===
 $CFG->enablewebservices = true;
 $CFG->enablewsrest = true;
-$CFG->enablewssoap = true;
-$CFG->enablewsxmlrpc = true;
+// $CFG->enablewssoap = true;
+// $CFG->enablewsxmlrpc = true;
 
 // === Sessions in DB (Cloud Run stateless safe) ===
 $CFG->session_handler_class = '\core\session\database';
 
 // === objectfs plugin config (GCS) ===
-$CFG->alternative_file_system_class = '\\tool_objectfs\\local\\store\\gcs\\gcs_file_system';
+$CFG->alternative_file_system_class = '\\tool_objectfs\\s3_file_system';
 $CFG->tool_objectfs_enabletasks = true;
 $CFG->tool_objectfs_enablepresignedurls = true;
 $CFG->tool_objectfs_signingexpiration = 86400;
 $CFG->tool_objectfs_useproxy = false;
 $CFG->tool_objectfs_deleteretentionperiod = 0;
 $CFG->tool_objectfs_gcs_bucket = getenv('GCS_BUCKET');
+$CFG->tool_objectfs_gcs_base_url = 'https://storage.googleapis.com';
 
 // Optional: key file if not using Workload Identity
 if (file_exists('/key.json')) {
