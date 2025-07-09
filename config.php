@@ -35,7 +35,7 @@ $_SERVER['HTTPS'] = 'on';
 $CFG->wwwroot = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
 // === Moodle data directory ===
-$CFG->dataroot  = '/moodledata';
+$CFG->dataroot  = '/tmp/moodledata';
 $CFG->admin     = 'admin';
 $CFG->directorypermissions = 0777;
 
@@ -48,6 +48,7 @@ $CFG->enablewebservices = true;
 $CFG->enablewsrest = true;
 // $CFG->enablewssoap = true;
 // $CFG->enablewsxmlrpc = true;
+$CFG->pathtophp = '/usr/bin/php';
 
 // === Sessions in DB (Cloud Run stateless safe) ===
 $CFG->session_handler_class = '\core\session\database';

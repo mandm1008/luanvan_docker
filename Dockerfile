@@ -44,14 +44,13 @@ COPY moodle.ini /etc/php/8.3/cli/conf.d/moodle.ini
 COPY --chown=www-data:www-data moodle/ /var/www/html/
 COPY --chown=www-data:www-data config.php /var/www/html/config.php
 
-
 # Tạo thư mục moodledata và các thư mục tạm
-RUN mkdir -p /moodledata \
+RUN mkdir -p /tmp/moodledata \
     /tmp/moodle-cache \
     /tmp/moodle-temp \
     /tmp/moodle-localcache && \
-    chown -R www-data:www-data /moodledata /tmp/moodle-* && \
-    chmod -R 777 /moodledata /tmp/moodle-*
+    chown -R www-data:www-data /tmp/moodledata /tmp/moodle-* && \
+    chmod -R 777 /tmp/moodledata /tmp/moodle-*
 
 # Copy nginx config
 COPY nginx/default.conf /etc/nginx/sites-available/default
@@ -67,5 +66,4 @@ EXPOSE 8080
 # CMD: Chạy PHP-FPM, Nginx và gọi entrypoint script
 CMD service php8.3-fpm start && \
     service nginx start && \
-    /entrypoint.sh && \
-    tail -f /dev/null
+    /entrypoint.sh
