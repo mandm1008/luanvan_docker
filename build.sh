@@ -66,11 +66,12 @@ if [ -n "$MOODLE_DIR" ]; then
 
   if [ -d "./moodle" ]; then
     echo "🧹 Removing existing ./moodle directory..."
-    rm -rf ./moodle
+    sudo rm -rf ./moodle
   fi
 
   echo "📥 Copying contents from '$MOODLE_DIR' into ./moodle..."
-  cp -r "$MOODLE_DIR" ./moodle
+  sudo cp -r "$MOODLE_DIR" ./moodle
+  sudo chmod -R 755 ./moodle
 else
   if [ ! -d "./moodle" ]; then
     echo "❌ Error: No --moodle-dir provided and ./moodle directory does not exist."
@@ -82,6 +83,10 @@ fi
 
 # Compose full image name
 IMAGE="gcr.io/$PROJECT_ID/$IMAGE_NAME:$TAG"
+
+# Authenticate Docker with GCR
+echo "🔐 Authenticating Docker with GCR..."
+gcloud auth configure-docker gcr.io --quiet
 
 # Build and push
 echo "🐳 Building Docker image: $IMAGE"
