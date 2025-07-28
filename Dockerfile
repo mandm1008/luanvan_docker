@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Cập nhật & cài công cụ cần thiết
 RUN apt-get update && apt-get install -y \
-    nginx software-properties-common curl gnupg2 lsb-release wget unzip tar
+    nginx software-properties-common curl ca-certificates gnupg2 lsb-release wget unzip tar
 
 # Thêm PPA PHP 8.3
 RUN add-apt-repository ppa:ondrej/php && \
